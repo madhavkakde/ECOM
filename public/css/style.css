@@ -97,6 +97,7 @@ body{
     color: #d5be8b;
 }
 
+
 /* best selling product */
 
 .best-selling-product-section{
@@ -331,4 +332,37 @@ footer{
     line-height: 50px;
     text-align: center;
     text-transform: capitalize;
+}
+
+.user-icon-popup{
+    position: absolute;
+    top: 200%;
+    right: 0;
+    padding: 20px;
+    display: none;
+    background: #fff;
+    font-family: 'latos', sans-serif;
+    width: 180px;
+    border-radius: 5px;
+    text-align: center;
+    border: 1px solid #190c05;
+}
+.user-icon-popup.active{
+    display: block;
+}
+.user-icon-popup p{
+    font-size: 1.2rem;
+    text-transform: capitalize;
+    line-height: 2rem;
+}
+.user-icon-popup a{
+    display: block;
+    text-decoration: none;
+    color: #fff;
+    margin: 20px auto 0;
+    background: #321d12;
+    padding: 10px;
+    width: 100px;
+    text-transform: capitalize;
+    border-radius: 5px;
 }

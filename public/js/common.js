@@ -1,19 +1,15 @@
-
 const sendData = (path, data) => {
-    console.log(data);
-    fetch(path,{
+    fetch(path, {
         method: 'POST',
         headers: new Headers({
             'Content-Type': 'application/json'
         }),
         body: JSON.stringify(data)
-    })
-    .then(res => res.json())
-    .then(data => processData(data))
+    }).then(res => res.json())
+    .then(data => processData(data));
 }
 
-const processData = (data) =>{
-    console.log(data);
+const processData = (data) => {
     loader.style.display = 'none';
     if(data.alert){
         showFormError(data.alert);
@@ -22,11 +18,16 @@ const processData = (data) =>{
         sessionStorage.user = JSON.stringify(data);
         location.replace('/');
     }
+    else if(data.seller){
+        let user = JSON.parse(sessionStorage.user);
+        user.seller = true;
+        sessionStorage.user = JSON.stringify(user);
+        location.replace('/dashboard');
+    }
 }
 
 const showFormError = (err) => {
     let errorEle = document.querySelector('.error');
     errorEle.innerHTML = err;
     errorEle.classList.add('show');
-
 }

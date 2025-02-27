@@ -79,16 +79,82 @@ app.post('/signup', async (req, res) => {
     }
 });
 
+// login route
+app.get('/login', (req, res) => {
+    res.sendFile("login.html", { root: "public" });
+})
+
+app.post('/login', async (req, res) => {
+    let { email, password } = req.body;
+
+    // Check if email and password are provided
+    if (!email.length || !password.length) {
+        return res.json({ alert: 'Please fill in all fields' });
+    }
+
+    try {
+        // Find user by email
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.json({ alert: 'Email does not exist' });
+        } else {
+            // Compare password
+            const isMatch = await bcrypt.compare(password, user.password);
+
+            if (isMatch) {
+                // Password is correct
+                return res.json({
+                    name: user.name,
+                    email: user.email,
+                    seller: user.seller
+                });
+            } else {
+                // Password is incorrect
+                return res.json({ alert: 'Password is incorrect' });
+            }
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ alert: 'Server error' });
+    }
+});
+
 // 404 route
 app.get('/404', (req, res) => {
     res.sendFile("404.html", { root: "public" });
+});
+
+// seller route
+app.get('/seller', (req, res) => {
+    res.sendFile("seller.html", { root: "public" });
+});
+
+app.post('/post', (req, res) => {
+ let { name, address, about, number, email } = req.body;
+  
+ if (!businessName.length || !address.length || !about.length || number.length < 10 || !Number(number)) {
+    showFormError('Some information(s) are missing or invalid');
+}
+else{
+    const sellers =  collection(db, 'sellers');
+setDoc(doc(sellers, email), req.body).then(data=>{
+    const users = collection(db, 'users');
+    updateDoc(doc(users, email), {
+        seller: true
+    }).then(data=>{
+        res.json({
+            seller: true
+        }) 
+    })
+})
+}
 });
 
 // Redirect all other routes to 404
 app.use((req, res) => {
     res.redirect('/404');
 });
-
 // Start server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
