@@ -11,12 +11,24 @@ applyBtn.addEventListener('click', async () => {
         showFormError('Some information(s) are missing or invalid');
     } else {
         loader.style.display = 'block';
-        sendData('/seller', {
+
+        let email;
+        try {
+            email = JSON.parse(sessionStorage.user).email; // Attempt to parse email
+        } catch (error) {
+            console.error("Failed to parse sessionStorage.user:", error);
+            showFormError('User  information is not available. Please log in again.');
+            loader.style.display = 'none'; // Hide loader if there's an error
+            return; // Exit the function
+        }
+
+        // Send data to the server
+        await sendData('/seller', {
             name: businessName,
             address: address,
             about: about,
             number: number,
-            email: JSON.parse(sessionStorage.user).email
+            email: email
         });
     }
 });

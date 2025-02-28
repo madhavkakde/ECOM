@@ -133,21 +133,32 @@ app.get('/seller', (req, res) => {
 app.post('/post', (req, res) => {
  let { name, address, about, number, email } = req.body;
   
- if (!businessName.length || !address.length || !about.length || number.length < 10 || !Number(number)) {
+ if (!name.length || !address.length || !about.length || number.length < 10 || !Number(number)) {
     showFormError('Some information(s) are missing or invalid');
 }
 else{
-    const sellers =  collection(db, 'sellers');
-setDoc(doc(sellers, email), req.body).then(data=>{
-    const users = collection(db, 'users');
-    updateDoc(doc(users, email), {
-        seller: true
-    }).then(data=>{
-        res.json({
-            seller: true
-        }) 
-    })
+    // Insert the seller document
+sellersCollection.insertOne(req.body)
+.then(() => {
+    // Update the user document to indicate they are a seller
+    return usersCollection.updateOne(
+        { email: req.body.email }, // Assuming email is in req.body
+        { $set: { seller: true } }
+    );
 })
+.then(() => {
+    // Respond with success
+    res.json({
+        seller: true
+    });
+})
+.catch(error => {
+    // Handle errors
+    console.error("Error updating documents: ", error);
+    res.status(500).json({
+        error: "An error occurred while updating the seller information."
+    });
+});
 }
 });
 
