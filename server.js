@@ -1,20 +1,54 @@
+const dotenv = require('dotenv');
 const express = require('express');
 const bodyParser = require('body-parser');
 const connectDB = require('./db/db'); // Import the connectDB function
 const User = require('./models/user.model'); // Import the User model
 const bcrypt = require('bcrypt'); // Import bcrypt for password hashing
-
+const sellerModel = require('./models/seller.model')
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("cloudinary").v2;
+const cors = require('cors');
 // Initialize the server
 const app = express();
 const PORT = process.env.PORT || 5001;
 
+// // aws
+// const aws = require('aws-sdk');
+// const dotenv = require('dotenv');
+
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+  });
+  // Set up Multer with Cloudinary storage
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: "ecommerce-images", // Folder in Cloudinary
+      allowed_formats: ["jpg", "png", "jpeg", "webp"]
+    }
+  });
+  
+  const upload = multer({ storage });
+  
+  // Image upload route
+  app.post("/upload", upload.single("image"), (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+    res.json({ imageUrl: req.file.path }); // Cloudinary URL
+  });
+  
 // Middleware
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Connect to MongoDB
-connectDB();
+ let db = connectDB();
 
 // Routes
 app.get('/', (req, res) => {
@@ -130,37 +164,57 @@ app.get('/seller', (req, res) => {
     res.sendFile("seller.html", { root: "public" });
 });
 
-app.post('/post', (req, res) => {
+app.post('/seller', async (req, res) => {
  let { name, address, about, number, email } = req.body;
-  
+
  if (!name.length || !address.length || !about.length || number.length < 10 || !Number(number)) {
-    showFormError('Some information(s) are missing or invalid');
+    return res.status(400).json({ error: 'Some information(s) are missing or invalid' }); // Improved error handling
 }
 else{
-    // Insert the seller document
-sellersCollection.insertOne(req.body)
-.then(() => {
-    // Update the user document to indicate they are a seller
-    return usersCollection.updateOne(
-        { email: req.body.email }, // Assuming email is in req.body
-        { $set: { seller: true } }
-    );
-})
-.then(() => {
-    // Respond with success
-    res.json({
-        seller: true
-    });
-})
-.catch(error => {
-    // Handle errors
-    console.error("Error updating documents: ", error);
-    res.status(500).json({
-        error: "An error occurred while updating the seller information."
-    });
-});
+
+    
+    try {
+        // Create or update the seller document
+        const seller = await sellerModel.findOneAndUpdate(
+            { email: email },
+            { name, address, about, number },
+            { upsert: true, new: true } // Create if not exists, return the new document
+        );
+
+        // Update the user document to indicate they are a seller
+        await User.findOneAndUpdate(
+            { email: email },
+            { seller: true },
+            { new: true, upsert: true } // Create if not exists, return the new document
+        );
+
+        // Send response
+        res.json({
+            seller: true,
+            message: 'Seller account created successfully!',
+            sellerData: seller
+        });
+    } catch (error) {
+        console.error("Error creating seller account:", error);
+        res.status(500).json({
+            error: "An error occurred while creating the seller account."
+        });
+    }
 }
 });
+
+   
+
+
+//dashboard route
+app.get('/dashboard', (req, res) => {
+    res.sendFile("dashboard.html", { root: "public" });
+    });
+
+//add-product route
+app.get('/add-product', (req, res) => {
+    res.sendFile("add-product.html", { root: "public" });
+})
 
 // Redirect all other routes to 404
 app.use((req, res) => {

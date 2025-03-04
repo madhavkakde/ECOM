@@ -7,7 +7,9 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true }, // User's email
     password: { type: String, required: true }, // User's password
     phone: { type: String, required: true }, // User's phone number
+    seller: { type: Boolean, default: false } // Track if the user is a seller
 });
+
 
 // Create the User model
 const User = mongoose.model('User ', userSchema);
