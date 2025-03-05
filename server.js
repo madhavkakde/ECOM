@@ -1,17 +1,18 @@
-const dotenv = require('dotenv');
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const connectDB = require('./db/db'); // Import the connectDB function
 const User = require('./models/user.model'); // Import the User model
 const bcrypt = require('bcrypt'); // Import bcrypt for password hashing
 const sellerModel = require('./models/seller.model')
+const product = require('./models/product.model')
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("cloudinary").v2;
 const cors = require('cors');
 // Initialize the server
 const app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5000;
 
 // // aws
 // const aws = require('aws-sdk');
@@ -22,33 +23,43 @@ cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
-  });
-  // Set up Multer with Cloudinary storage
+});
+// Set up Multer with Cloudinary storage
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-      folder: "ecommerce-images", // Folder in Cloudinary
-      allowed_formats: ["jpg", "png", "jpeg", "webp"]
+        folder: "ecommerce-images", // Folder in Cloudinary
+        allowed_formats: ["jpg", "png", "jpeg", "webp"]
     }
-  });
-  
-  const upload = multer({ storage });
-  
-  // Image upload route
-  app.post("/upload", upload.single("image"), (req, res) => {
+});
+
+const upload = multer({ storage });
+
+// In-memory storage for the uploaded image URL
+let uploadedImageUrl = '';
+
+// Image upload route
+app.post("/upload", upload.single("image"), (req, res) => {
     if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded" });
+        return res.status(400).json({ error: "No file uploaded" });
     }
-    res.json({ imageUrl: req.file.path }); // Cloudinary URL
-  });
-  
+    uploadedImageUrl = req.file.path; // Store the image URL
+    res.json({ imageUrl: uploadedImageUrl }); // Return the Cloudinary URL
+});
+app.get("/image-url", (req, res) => {
+    if (!uploadedImageUrl) {
+        return res.status(404).json({ error: "No image uploaded yet" });
+    }
+    res.json(uploadedImageUrl); // Return the stored image URL
+});
+
 // Middleware
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Connect to MongoDB
- let db = connectDB();
+let db = connectDB();
 
 // Routes
 app.get('/', (req, res) => {
@@ -80,8 +91,8 @@ app.post('/signup', async (req, res) => {
 
     try {
         // Check if user already exists by email
-        const existingUser  = await User.findOne({ email });
-        if (existingUser ) {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
             return res.json({ alert: 'Email already exists' });
         }
 
@@ -90,7 +101,7 @@ app.post('/signup', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         // Create a new user
-        const newUser  = new User({
+        const newUser = new User({
             name,
             email,
             password: hashedPassword,
@@ -99,13 +110,13 @@ app.post('/signup', async (req, res) => {
         });
 
         // Save the new user to the database
-        await newUser .save();
+        await newUser.save();
 
         // Respond with the new user data (excluding the password)
         res.json({
-            name: newUser .name,
-            email: newUser .email,
-            seller: newUser .seller,
+            name: newUser.name,
+            email: newUser.email,
+            seller: newUser.seller,
         });
     } catch (error) {
         console.error('Error creating user:', error);
@@ -165,55 +176,109 @@ app.get('/seller', (req, res) => {
 });
 
 app.post('/seller', async (req, res) => {
- let { name, address, about, number, email } = req.body;
+    let { name, address, about, number, email } = req.body;
 
- if (!name.length || !address.length || !about.length || number.length < 10 || !Number(number)) {
-    return res.status(400).json({ error: 'Some information(s) are missing or invalid' }); // Improved error handling
-}
-else{
-
-    
-    try {
-        // Create or update the seller document
-        const seller = await sellerModel.findOneAndUpdate(
-            { email: email },
-            { name, address, about, number },
-            { upsert: true, new: true } // Create if not exists, return the new document
-        );
-
-        // Update the user document to indicate they are a seller
-        await User.findOneAndUpdate(
-            { email: email },
-            { seller: true },
-            { new: true, upsert: true } // Create if not exists, return the new document
-        );
-
-        // Send response
-        res.json({
-            seller: true,
-            message: 'Seller account created successfully!',
-            sellerData: seller
-        });
-    } catch (error) {
-        console.error("Error creating seller account:", error);
-        res.status(500).json({
-            error: "An error occurred while creating the seller account."
-        });
+    if (!name.length || !address.length || !about.length || number.length < 10 || !Number(number)) {
+        return res.status(400).json({ error: 'Some information(s) are missing or invalid' }); // Improved error handling
     }
-}
+    else {
+
+
+        try {
+            // Create or update the seller document
+            const seller = await sellerModel.findOneAndUpdate(
+                { email: email },
+                { name, address, about, number },
+                { upsert: true, new: true } // Create if not exists, return the new document
+            );
+
+            // Update the user document to indicate they are a seller
+            await User.findOneAndUpdate(
+                { email: email },
+                { seller: true },
+                { new: true, upsert: true } // Create if not exists, return the new document
+            );
+
+            // Send response
+            res.json({
+                seller: true,
+                message: 'Seller account created successfully!',
+                sellerData: seller
+            });
+        } catch (error) {
+            console.error("Error creating seller account:", error);
+            res.status(500).json({
+                error: "An error occurred while creating the seller account."
+            });
+        }
+    }
 });
 
-   
+
 
 
 //dashboard route
 app.get('/dashboard', (req, res) => {
     res.sendFile("dashboard.html", { root: "public" });
-    });
+});
 
 //add-product route
 app.get('/add-product', (req, res) => {
     res.sendFile("add-product.html", { root: "public" });
+})
+
+app.post('/add-product', (req, res) => {
+    let { name, shortDes, detail, price, image, tags, email, draft } = req.body;
+
+    if (!name.length) {
+        res.json({ 'alert': 'should enter the product name' });
+    }
+    else if (!shortDes.length) {
+        res.json({ 'alert': 'enter the product description' });
+    }
+    else if ((!price.length) || !Number(price)) {
+        res.json({ 'alert': 'enter the product price' });
+    }
+    else if (!detail.length) {
+        res.json({ 'alert': 'enter the product details' });
+    }
+    else if (!tags.length) {
+        res.json({ 'alert': 'enter the product tags' });
+    }
+    else{
+        // code for firebase
+
+        // let docName = `${name.toLowerCase()}.${Math.floor(Math.random() * 50000)}`
+
+        // let product = collection(db, "products");
+        // setDoc(doc(products, docName), req.body)
+        // .then(data => {
+        //     res.json({'product': name});
+        // })
+        // .catch(err => {
+        //     res.json({'alert': 'some error occured'});
+        // })
+
+        // code for mongodb
+         // Create a unique document name
+    let docName = `${name.toLowerCase()}.${Math.floor(Math.random() * 50000)}`;
+
+    // Create a new product instance
+    const newProduct = new product({
+        name: docName,
+        ...req.body // Spread the rest of the fields from the request body
+    });
+
+    // Save the product to the database
+    newProduct.save()
+        .then(() => {
+            res.json({ product: name });
+        })
+        .catch(err => {
+            console.error('Error adding product:', err);
+            res.status(500).json({ alert: 'Some error occurred' });
+        });
+    }
 })
 
 // Redirect all other routes to 404
