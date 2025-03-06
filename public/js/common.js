@@ -38,10 +38,11 @@ const processData = (data) => {
         let user = JSON.parse(sessionStorage.user);
         user.seller = true;
         sessionStorage.user = JSON.stringify(user);
-        location.replace('/dashboard');
+        location.replace('ashboard');
     }
     else if(data.product){
         location.replace('/dashboard');
+        // console.log(data)
     }
 }
 

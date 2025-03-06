@@ -10,6 +10,7 @@ const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("cloudinary").v2;
 const cors = require('cors');
+
 // Initialize the server
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -56,6 +57,7 @@ app.get("/image-url", (req, res) => {
 // Middleware
 app.use(express.static('public'));
 app.use(bodyParser.json());
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Connect to MongoDB
@@ -138,7 +140,9 @@ app.post('/login', async (req, res) => {
     }
 
     try {
+        console.log('Login request body:', req.body); // Log the incoming request body
         // Find user by email
+
         const user = await User.findOne({ email });
 
         if (!user) {
@@ -148,7 +152,9 @@ app.post('/login', async (req, res) => {
             const isMatch = await bcrypt.compare(password, user.password);
 
             if (isMatch) {
+                console.log('Login successful for user:', user.email); // Log successful login
                 // Password is correct
+
                 return res.json({
                     name: user.name,
                     email: user.email,
@@ -266,6 +272,7 @@ app.post('/add-product', (req, res) => {
     // Create a new product instance
     const newProduct = new product({
         name: docName,
+        email: sellerModel.email,
         ...req.body // Spread the rest of the fields from the request body
     });
 
@@ -280,6 +287,60 @@ app.post('/add-product', (req, res) => {
         });
     }
 })
+
+//get-products route
+
+
+
+// CODE FROM YOUTUBE FOR FIRESTORE
+
+//     let products = collection(db, "products");
+//     let docRef;
+
+//     docRef = getDocs(query(products, where("email", "==", email)))
+
+//     docRef.then(products => { 
+//         if(products.empty){
+//             return res.json('no products');
+//         }
+//         let productArr = [];
+
+//         products.forEach(item => {
+//             let data = item.data();
+//             data.id = item.id;
+//             productArr.push(data);
+//         })
+//         res.json(productArr);
+//     })
+
+// })
+
+// CODE FOR MONGODB
+app.post('/get-products', async (req, res) => {
+    const { email } = req.body;
+    console.log(req.body)
+    if (!email) {
+        return res.status(400).json({ error: 'Email is required' });
+    }
+    console.log("if")
+    try {
+        const products = await product.find({ email });
+        console.log("finding email")
+        if (products.length === 0) {
+            return res.status(404).json({ message: 'No products found' });
+        }
+        console.log("getting prod")
+        const productArr = products.map(product => ({
+            id: product._id,
+            ...product.toObject()
+        }));
+        console.log("sendign res")
+        res.status(200).json(productArr);
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 // Redirect all other routes to 404
 app.use((req, res) => {

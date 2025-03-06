@@ -1,4 +1,5 @@
 // models/Product.js
+const { type } = require('express/lib/response');
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
@@ -6,6 +7,10 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true // Removes whitespace from both ends
+    },
+    email:{
+        type: String,
+        required: true
     },
     shortDes: {
         type: String,
