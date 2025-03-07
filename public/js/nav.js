@@ -21,11 +21,11 @@ navbar.innerHTML += `
         </ul>
         <div class="user-interactions">
             <div class="cart">
-                <img src="./img/cart.png" class="cart-icon" alt="">
+                <img src="../img/cart.png" class="cart-icon" alt="">
                 <span class="cart-item-count">00</span>
             </div>
             <div class="user">
-                <img src="./img/user.png" class="user-icon" alt="">
+                <img src="../img/user.png" class="user-icon" alt="">
                 <div class="user-icon-popup">
                     <p>login to your account</p>
                     <a>login</a>

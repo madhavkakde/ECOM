@@ -195,7 +195,7 @@ const setFormData = (data) => {
         tags.innerHTML = data.tags;
 
         let productImg = document.querySelector('.product-img'); // Getting the product image
-        productImg.src = data.image ? data.image : imagePath;
+        productImg.src = data.img ? data.img : imagePath;
         console.log(imagePath)
         console.log(productImg.src)
 

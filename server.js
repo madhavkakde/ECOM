@@ -57,6 +57,7 @@ app.get("/image-url", (req, res) => {
 // Middleware
 app.use(express.static('public'));
 app.use(bodyParser.json());
+app.use(express.json());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -279,12 +280,11 @@ if (id === undefined) {
     console.log(id)
     // Generate a new document name
     const docName = `${name.toLowerCase()}.${Math.floor(Math.random() * 50000)}`;
-    console.log(3)
     // Create a new product instance
     const newProduct = new product({
         name: docName,
         email: sellerModel.email,
-        img: uploadedImageUrl,
+        img: uploadedImageUrl == '' ? image : uploadedImageUrl,
         ...req.body // Spread the rest of the fields from the request body
     });
     console.log(4)
@@ -350,8 +350,9 @@ if (id === undefined) {
 app.post('/get-products', async (req, res) => {
     const { email, id } = req.body;
     console.log(req.body); // Log the incoming request body
-
+    console.log(id)
     // Check if an ID is provided
+    console.log(1)
     if (id) {
         try {
             // Find the product by ID
@@ -364,6 +365,7 @@ app.post('/get-products', async (req, res) => {
             }
 
             // Send the found product as a response
+            console.log("product sent")
             return res.status(200).json(productID);
         } catch (error) {
             console.error('Error finding product by ID:', error);
@@ -438,6 +440,10 @@ app.post('/delete-product', async (req, res) => {
     }
 });
 
+// product page
+app.get('/products/:id', async (req, res) => {
+    res.sendFile("product.html", { root: "public" });
+})
 // Redirect all other routes to 404
 app.use((req, res) => {
     res.redirect('/404');
