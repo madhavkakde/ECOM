@@ -7,13 +7,7 @@ async function sendData(url, data) {
             },
             body: JSON.stringify(data)
         });
-
         loader.style.display = 'none'; // Hide loader after response
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
         const result = await response.json();
         // Handle success (e.g., show a success message or redirect)
         console.log('Success:', result);
@@ -42,7 +36,6 @@ const processData = (data) => {
     }
     else if(data.product){
         location.replace('/dashboard');
-        // console.log(data)
     }
 }
 

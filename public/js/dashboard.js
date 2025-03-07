@@ -61,14 +61,13 @@ const setupProducts = () => {
         return res.json(); // Process the response as JSON
     })
     .then(data => {
-        if (data.length === 0) {
-            alert('No products found.'); // User-friendly message
-            loader.style.display = 'none'; // Hide loader
-            return; // Exit the function
-        }
         console.log(data); // Handle the data received from the server
-
         loader.style.display = 'none'; // Hide loader after processing data
+        if(data == 'no products'){
+            noProductImg.style.display = 'block';
+        } else{
+            data.forEach(product => createProduct(product));
+        }
     })
     .catch(error => {
         console.error('Error fetching products:', error);

@@ -8,23 +8,23 @@ const productSchema = new mongoose.Schema({
         required: true,
         trim: true // Removes whitespace from both ends
     },
+    img: {
+        type: String
+    },
     email:{
         type: String,
         required: true
     },
     shortDes: {
         type: String,
-        required: true,
         trim: true
     },
     price: {
-        type: Number,
-        required: true,
+        type: String,
         min: 0 // Price should be a positive number
     },
     detail: {
         type: String,
-        required: true,
         trim: true
     },
     tags: {

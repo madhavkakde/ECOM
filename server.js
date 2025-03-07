@@ -233,25 +233,32 @@ app.get('/add-product', (req, res) => {
     res.sendFile("add-product.html", { root: "public" });
 })
 
-app.post('/add-product', (req, res) => {
-    let { name, shortDes, detail, price, image, tags, email, draft } = req.body;
+app.get('/add-product/:id', (req, res) => {
+    res.sendFile("add-product.html", { root: "public" });
+})
 
-    if (!name.length) {
-        res.json({ 'alert': 'should enter the product name' });
+
+
+app.post('/add-product', (req, res) => {
+    let { name, shortDes, detail, price, image, tags, email, draft, id } = req.body;
+
+    if(!draft){
+        if (!name.length) {
+            res.json({ 'alert': 'should enter the product name' });
+        }
+        else if (!shortDes.length) {
+            res.json({ 'alert': 'enter the product description' });
+        }
+        else if ((!price.length) || !Number(price)) {
+            res.json({ 'alert': 'enter the product price' });
+        }
+        else if (!detail.length) {
+            res.json({ 'alert': 'enter the product details' });
+        }
+        else if (!tags.length) {
+            res.json({ 'alert': 'enter the product tags' });
+        }
     }
-    else if (!shortDes.length) {
-        res.json({ 'alert': 'enter the product description' });
-    }
-    else if ((!price.length) || !Number(price)) {
-        res.json({ 'alert': 'enter the product price' });
-    }
-    else if (!detail.length) {
-        res.json({ 'alert': 'enter the product details' });
-    }
-    else if (!tags.length) {
-        res.json({ 'alert': 'enter the product tags' });
-    }
-    else{
         // code for firebase
 
         // let docName = `${name.toLowerCase()}.${Math.floor(Math.random() * 50000)}`
@@ -267,25 +274,49 @@ app.post('/add-product', (req, res) => {
 
         // code for mongodb
          // Create a unique document name
-    let docName = `${name.toLowerCase()}.${Math.floor(Math.random() * 50000)}`;
-
+        // Check if id is defined
+if (id === undefined) {
+    console.log(id)
+    // Generate a new document name
+    const docName = `${name.toLowerCase()}.${Math.floor(Math.random() * 50000)}`;
+    console.log(3)
     // Create a new product instance
     const newProduct = new product({
         name: docName,
         email: sellerModel.email,
+        img: uploadedImageUrl,
         ...req.body // Spread the rest of the fields from the request body
     });
-
+    console.log(4)
     // Save the product to the database
     newProduct.save()
-        .then(() => {
-            res.json({ product: name });
+        .then(savedProduct => {
+            res.json({ product: savedProduct });
         })
         .catch(err => {
             console.error('Error adding product:', err);
-            res.status(500).json({ alert: 'Some error occurred' });
+            res.status(500).json({ alert: 'An error occurred while adding the product' });
         });
-    }
+} else {
+    // If id is defined, update the existing product
+    product.findByIdAndUpdate(id, {
+        name: req.body.name || undefined, // Only update if provided
+        email: sellerModel.email,
+        img: uploadedImageUrl,
+        ...req.body // Spread the rest of the fields from the request body
+    }, { new: true }) // Return the updated document
+    .then(updatedProduct => {
+        if (!updatedProduct) {
+            return res.status(404).json({ alert: 'Product not found' });
+        }
+        res.json({ product: updatedProduct });
+    })
+    .catch(err => {
+        console.error('Error updating product:', err);
+        res.status(500).json({ alert: 'An error occurred while updating the product' });
+    });
+}
+    
 })
 
 //get-products route
@@ -317,28 +348,93 @@ app.post('/add-product', (req, res) => {
 
 // CODE FOR MONGODB
 app.post('/get-products', async (req, res) => {
-    const { email } = req.body;
-    console.log(req.body)
-    if (!email) {
-        return res.status(400).json({ error: 'Email is required' });
-    }
-    console.log("if")
-    try {
-        const products = await product.find({ email });
-        console.log("finding email")
-        if (products.length === 0) {
-            return res.status(404).json({ message: 'No products found' });
+    const { email, id } = req.body;
+    console.log(req.body); // Log the incoming request body
+
+    // Check if an ID is provided
+    if (id) {
+        try {
+            // Find the product by ID
+            const productID = await product.findById(id);
+            console.log(productID); // Log the found product
+
+            // Check if the product was found
+            if (!productID) {
+                return res.status(404).json({ error: 'Product not found' });
+            }
+
+            // Send the found product as a response
+            return res.status(200).json(productID);
+        } catch (error) {
+            console.error('Error finding product by ID:', error);
+            return res.status(500).json({ error: 'Internal server error' });
         }
-        console.log("getting prod")
-        const productArr = products.map(product => ({
-            id: product._id,
-            ...product.toObject()
-        }));
-        console.log("sendign res")
-        res.status(200).json(productArr);
-    } catch (error) {
-        console.error("Error fetching products:", error);
-        res.status(500).json({ error: 'Internal server error' });
+    } else {
+        // If no ID is provided, check for email
+        if (!email) {
+            return res.status(400).json({ error: 'Email is required' });
+        }
+
+        console.log("Finding products by email");
+        try {
+            const products = await product.find({ email });
+            console.log("Products found:", products);
+
+            if (products.length === 0) {
+                return res.status(404).json({ message: 'No products found' });
+            }
+
+            // Map the products to include their IDs
+            const productArr = products.map(prod => ({
+                id: prod._id,
+                ...prod.toObject()
+            }));
+
+            // Send the array of products as a response
+            return res.status(200).json(productArr);
+        } catch (error) {
+            console.error("Error fetching products:", error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+});
+
+// delete-product route
+
+// CODE FROM YOUTUBE FOR FIRESTORE
+
+// app.post('/delete-product', (req, res) => {
+//     let {id} = req.body;
+
+//     deleteDoc(doc(collection(db, "products"), id))
+//     .then(data => {
+//         res.json('success');
+//     }).catch(err => {
+//         res.json('err');
+//     })
+// })
+
+// CODE FOR MONGODB
+app.post('/delete-product', async (req, res) => {
+    const { id } = req.body;
+
+    if (!id) {
+        return res.status(400).json({ error: 'Product ID is required' });
+    }
+
+    try {
+        // Delete the product by ID
+        const result = await product.deleteOne({ _id: id });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+
+        // Send success response
+        res.json('success');
+    } catch (err) {
+        console.error('Error deleting product:', err);
+        res.status(500).json({ error: 'Failed to delete product' });
     }
 });
 
