@@ -348,7 +348,7 @@ if (id === undefined) {
 
 // CODE FOR MONGODB
 app.post('/get-products', async (req, res) => {
-    const { email, id } = req.body;
+    const { email, id, tags } = req.body;
     console.log(req.body); // Log the incoming request body
     console.log(id)
     // Check if an ID is provided
@@ -371,7 +371,26 @@ app.post('/get-products', async (req, res) => {
             console.error('Error finding product by ID:', error);
             return res.status(500).json({ error: 'Internal server error' });
         }
-    } else {
+    }
+    else if(tags){
+        // CODE FROM YOUTUBE FOR FIRESTORE
+        // docRef = getDocs(query(products, where("tags", "array-container", tag)))
+        try{
+        //CODE FOR YOUTUBE
+        const query = { tags: { $in: tags } }; 
+        const results = await product.find(query).lean(); // Use lean() for plain JavaScript objects
+        console.log('Found products:', results);
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'No products found for the given tags' });
+        }
+        return res.status(200).json(results);
+    }
+        catch (error) {
+            console.error('Error finding products by tags:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+     else {
         // If no ID is provided, check for email
         if (!email) {
             return res.status(400).json({ error: 'Email is required' });

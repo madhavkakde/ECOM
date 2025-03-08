@@ -1,3 +1,5 @@
+import {getProducts, createProductCards} from './home.js';
+
 let ratingStarInput = [...document.querySelectorAll('.rating-star')];
 
 ratingStarInput.map((star, index) => {
@@ -28,6 +30,7 @@ const setData = (data) => {
     shortDes.innerHTML = data.shortDes; // Use textContent for safety
     detail.innerHTML = data.detail; // Use textContent for safety
     price.innerHTML = `$${data.price}`; // Use textContent for safety
+    console.log(data)
 }
 
 const fetchProductData = () => {
@@ -53,11 +56,13 @@ const fetchProductData = () => {
             return;
         }
         setData(data);
+        alert("product found")
+        getProducts(data.tags[0]).then(res => createProductCards(res, 'similar products', '.best-selling-product-section'));
     })
     .catch(err => {
-        console.error(err);
+        console.log(err);
         alert('No product found');
-        location.replace('/404');
+        // location.replace('/404');
     });
 }
 
