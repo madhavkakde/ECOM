@@ -6,6 +6,8 @@
     padding: 60px 5vw;
 }
 .product-container{
+    justify-content: flex-start;
+    gap: 20px;
     flex-wrap: wrap;
 } 
 .product-card{

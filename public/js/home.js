@@ -19,6 +19,7 @@ collageImages.map((item, i) => {
 })
 
 // get product function
+let ProductId = null;
 export const getProducts = (tag) => {
     return fetch('/get-products', {
         method: 'post',

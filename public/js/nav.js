@@ -20,6 +20,11 @@ navbar.innerHTML += `
             <li class="link-item"><a href="#" class="link">Contact</a></li>
         </ul>
         <div class="user-interactions">
+            <div class="search-box">
+                <input type="text" class="search" placeholder="search item">
+                <button class="search-btn"><img src="../img/search.png" alt="">
+                </button>
+            </div>
             <div class="cart">
                 <img src="../img/cart.png" class="cart-icon" alt="">
                 <span class="cart-item-count">00</span>
@@ -72,3 +77,12 @@ const logout = () => {
     sessionStorage.clear('user');
     location.reload();
 }
+
+// SEARCH BOX
+let searchBtn = document.querySelector('.search-btn');
+let searchBox = document.querySelector('.search');
+searchBtn.addEventListener('click', () => {
+    if(searchBox.value.length){
+        location.href = `/search/${searchBox.value}`;
+    }
+})

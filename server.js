@@ -462,7 +462,11 @@ app.post('/delete-product', async (req, res) => {
 // product page
 app.get('/products/:id', async (req, res) => {
     res.sendFile("product.html", { root: "public" });
-})
+});
+// search page
+app.get('/search/:key', async (req, res) => {
+    res.sendFile("search.html", { root: "public" });
+});
 // Redirect all other routes to 404
 app.use((req, res) => {
     res.redirect('/404');
