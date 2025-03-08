@@ -12,6 +12,10 @@
     height: 600px;
     object-fit: cover ;
 }
+.product-detail{
+    width: 60%;
+    max-width: 60%;
+}
 .product-title{
     font-size: 50px;
 }
