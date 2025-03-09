@@ -4,8 +4,9 @@ const bodyParser = require('body-parser');
 const connectDB = require('./db/db'); // Import the connectDB function
 const User = require('./models/user.model'); // Import the User model
 const bcrypt = require('bcrypt'); // Import bcrypt for password hashing
-const sellerModel = require('./models/seller.model')
-const product = require('./models/product.model')
+const sellerModel = require('./models/seller.model');
+const product = require('./models/product.model');
+const Review = require('./models/review.model');
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("cloudinary").v2;
@@ -170,11 +171,6 @@ app.post('/login', async (req, res) => {
         console.error(error);
         return res.status(500).json({ alert: 'Server error' });
     }
-});
-
-// 404 route
-app.get('/404', (req, res) => {
-    res.sendFile("404.html", { root: "public" });
 });
 
 // seller route
@@ -463,10 +459,108 @@ app.post('/delete-product', async (req, res) => {
 app.get('/products/:id', async (req, res) => {
     res.sendFile("product.html", { root: "public" });
 });
+
 // search page
 app.get('/search/:key', async (req, res) => {
     res.sendFile("search.html", { root: "public" });
 });
+
+// review route
+app.post('/add-review', (req, res) => {
+    let { headline, review, rate, email, product } = req.body;
+    console.log(req.body)
+    
+    // FORM VALIDATION
+    if (!headline.length || !review.length || rate == 0 || email == null || !product) {
+        return res.json({ 'alert': 'Fill all the inputs' });
+    }
+
+    // CODE FROM YOUTUBE FOR FIRESTORE
+    // storing review in db
+    // let reviews = collection(db, "reviews");
+    // let docName =  `review-${email}-${product}`;
+
+    // setDoc(doc(reviews, docName), req.body)
+    // .then(data => {
+    //     return res.json({'review': data.data()})
+    // }).catch(err => res.json({'alert': 'some error occured'}));
+
+    // CODE FOR MONGODB
+    const newReview = new Review({
+        headline,  // Use the correct variable names
+        review,    // Use the correct variable names
+        rating: rate, // Use the correct variable names
+        email,
+        product
+    });
+
+    newReview.save()
+        .then(data => {
+            return res.json({ 'review': data });
+        })
+        .catch(err => {
+            console.error('Error saving document: ', err);
+            return res.json({ 'alert': 'Some error occurred' });
+        });
+})
+
+// get-reviews route
+app.post('/get-reviews', async (req, res) => {
+    let { product, email } = req.body;
+
+    // Validate the product parameter
+    if (!product) {
+        return res.status(400).json({ alert: 'Product parameter is required' });
+    }
+
+    try {
+        // Find reviews for the specified product, limited to 4
+        const reviews = await Review.find({ product: product }).limit(4);
+        let reviewArr = [];
+
+        // Check if reviews are found
+        if (reviews.length === 0) {
+            return res.json(reviewArr); // Return an empty array if no reviews are found
+        }
+
+        let userEmail = false;
+
+        // Process the reviews
+        reviews.forEach(item => {
+            let reviewEmail = item.email; // Access email directly
+            if (reviewEmail === email) {
+                userEmail = true; // Check if the user's email matches
+            }
+            reviewArr.push(item); // Push the review document into the array
+        });
+
+        // If the user's email is not found in the reviews, fetch the specific review
+        if (!userEmail) {
+            const specificReview = await Review.findOne({ email: email, product: product });
+            if (specificReview) {
+                reviewArr.push(specificReview); // Push the found review into the array
+            }
+        }
+
+        // Send the response with the collected reviews
+
+        return res.json(reviewArr);
+    } catch (err) {
+        console.error('Error fetching reviews: ', err);
+        res.status(500).json({ alert: 'An error occurred while fetching reviews' });
+    }
+});
+
+// CART Route
+app.get('/cart', (req, res) => {
+    res.sendFile("cart.html", { root: "public" });
+})
+
+// 404 route
+app.get('/404', (req, res) => {
+    res.sendFile("404.html", { root: "public" });
+});
+
 // Redirect all other routes to 404
 app.use((req, res) => {
     res.redirect('/404');

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Store - Product Page</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/form.css">
     <link rel="stylesheet" href="../css/product.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,6 +18,8 @@
 <body>
     <nav class="navbar dark">
      </nav>
+
+     <img src="./img/loading.gif" class="loader" alt="">
 
         <!-- product details -->
          <section class="product-section">
@@ -49,33 +52,15 @@
 
      <!-- review section -->
      <section class="review-section">
-        <h1 class="section-title">review</h1>
+        <!-- <h1 class="section-title">review</h1>
         <div class="review-container">
             <div class="review-card">
                 <div class="user-dp" data-rating="4.9"><img src="../img/user 1.png" alt="">
                 </div>
                     <h2 class="review-title">best quality more than my expectation</h2>
                 <p class="review">Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi omnis perspiciatis ipsam perferendis quam, eius sequi facere atque vitae possimus.</p>
-            </div>
-            <div class="review-card">
-                <div class="user-dp" data-rating="4.9"><img src="../img/user 2.png" alt="">
-                    </div>
-                    <h2 class="review-title">on time delievery and good packaging</h2>
-                <p class="review">Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi omnis perspiciatis ipsam perferendis quam, eius sequi facere atque vitae possimus.</p>
-            </div>
-            <div class="review-card">
-                <div class="user-dp" data-rating="4.9"><img src="../img/user 3.png" alt="">
-                    </div>
-                    <h2 class="review-title">best cutomer support</h2>
-                <p class="review">Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi omnis perspiciatis ipsam perferendis quam, eius sequi facere atque vitae possimus.</p>
-            </div>
-            <div class="review-card">
-                <div class="user-dp" data-rating="4.9"><img src="../img/user 4.png" alt="">
-                </div>
-                    <h2 class="review-title">easy to return/refund policy</h2>
-                <p class="review" >Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi omnis perspiciatis ipsam perferendis quam, eius sequi facere atque vitae possimus.</p>
-            </div>
-        </div>
+            </div>           
+        </div>  -->
 </section>
 
     <!-- add - a - review -section - form -->
@@ -91,6 +76,7 @@
             <img src="../img/no fill star.png" class="rating-star" alt="">
             <img src="../img/no fill star.png" class="rating-star" alt="">
         </div>
+        <span class="error">**this is an error</span>
         <button class="add-review-btn">add review</button>
      </section>
 
@@ -109,8 +95,10 @@
       <footer>
         made by mk
      </footer>
-      <script type="module" src="../js/home.js"></script>
-      <script type="module" src="../js/product.js"></script>
-      <script type="module" src="../js/nav.js"></script>
+     <script src="../js/home.js"></script>
+     <script src="../js/nav.js"></script>
+     <script src="../js/common.js"></script>
+     <script src="../js/product.js"></script>
+      <script src="../js/review.js"></script>
 </body>
 </html>

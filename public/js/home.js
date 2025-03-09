@@ -20,7 +20,7 @@ collageImages.map((item, i) => {
 
 // get product function
 let ProductId = null;
-export const getProducts = (tag) => {
+ const getProducts = (tag) => {
     return fetch('/get-products', {
         method: 'post',
         headers: new Headers ({ 'Content-Type': 'application/json'}),
@@ -34,7 +34,7 @@ export const getProducts = (tag) => {
     })
 };
 
- export const createProductCards = (data, title, ele) => {
+  const createProductCards = (data, title, ele) => {
     const container = document.querySelector(ele);
     container.innerHTML += `
     <h1 class="section-title"> ${title}</h1>
@@ -54,4 +54,27 @@ const createCards = data => {
     `
 })
     return cards;
+}
+
+// CART Function
+
+const add_product_to_cart = product => {
+    updateNavCartCounter();
+    let cart = JSON.parse(localStorage.getItem('cart'));
+
+    if(cart == null){
+        cart = [];
+    }
+
+    product = {
+        item: 1,
+        name: product.name,
+        price: product.price,
+        shortDes: product.shortDes,
+        image: product.img
+    }
+
+    cart.push(product);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    return 'added';
 }
