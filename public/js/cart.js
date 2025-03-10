@@ -42,7 +42,7 @@ const setCartProducts = () => {
 const updateBill = () => {
     updateNavCartCounter();
     let billPrice = document.querySelector('.bill');
-    billPrice.innerHTML =  `$${totalBill}`
+    billPrice.innerHTML = `$${totalBill}`
 }
 
 const setupCartEvents = () => {
@@ -52,14 +52,14 @@ const setupCartEvents = () => {
     const counts = document.querySelectorAll('.cart-container .item-count');
     const price = document.querySelectorAll('.cart-container .cart-product-price');
     const deleteBtn = document.querySelectorAll('.cart-container .cart-delete-btn');
-    
+
     let product = JSON.parse(localStorage.getItem('cart'));
-    
+
     counts.forEach((item, i) => {
         let cost = Number(price[i].getAttribute('data-price'));
-        
-        counterMinus[i].addEventListener('click', () =>{
-            if(item.innerHTML > 1){
+
+        counterMinus[i].addEventListener('click', () => {
+            if (item.innerHTML > 1) {
                 item.innerHTML--;
                 totalBill -= cost;
                 updateBill();
@@ -70,13 +70,13 @@ const setupCartEvents = () => {
                 localStorage.setItem('cart', JSON.stringify(product));
             }
         })
-        counterPlus[i].addEventListener('click', () =>{
-            if(item.innerHTML < 9){
+        counterPlus[i].addEventListener('click', () => {
+            if (item.innerHTML < 9) {
                 item.innerHTML++;
                 totalBill += cost;
                 updateBill();
                 price[i].innerHTML = `$${item.innerHTML * cost}`;
-                
+
                 // code when refresh the page prices will stay the same
                 product[i].item = item.innerHTML;
                 localStorage.setItem('cart', JSON.stringify(product));
@@ -85,11 +85,12 @@ const setupCartEvents = () => {
     })
     deleteBtn.forEach((item, i) => {
         item.addEventListener('click', () => {
-            product = product.filter((data, index) => index != 1);
-            localStorage.setItem('cart',JSON.stringify(product));
+            // Remove the item at the index corresponding to the clicked button
+            product = product.filter((data, index) => index !== i);
+            localStorage.setItem('cart', JSON.stringify(product));
             location.reload();
-        })
-    })
+        });
+    });
 }
 
 setCartProducts();

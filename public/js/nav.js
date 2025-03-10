@@ -24,7 +24,7 @@ const createNavbar = () => {
                 <button class="search-btn"><img src="../img/search.png" alt="">
                 </button>
             </div>
-            <div class="cart" onclick="location.href = '/cart'">
+            <div class="cart" onclick=cartBtnFunction()>
                 <img src="../img/cart.png" class="cart-icon" alt="">
                 <span class="cart-item-count">00</span>
             </div>
@@ -107,3 +107,13 @@ const updateNavCartCounter = () => {
 }
 
 updateNavCartCounter();
+
+const cartBtnFunction = () => {
+    if(user == null || undefined){
+        alert('login to view cart');
+        location.href = '/login';
+    }
+    else{
+        location.href = '/cart';
+    }
+}

@@ -142,7 +142,7 @@
     font-size: 18px;
 }
 
-.checkout-btn{
+.checkout-btn, .place-order-btn{
     display: block;
     width: 100%;
     border: none;
