@@ -11,6 +11,8 @@ const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("cloudinary").v2;
 const cors = require('cors');
+const paypal = require("@paypal/checkout-server-sdk");
+const {client} = require('./public/js/paypalConfig');
 
 // Initialize the server
 const app = express();
@@ -69,6 +71,11 @@ let db = connectDB();
 app.get('/', (req, res) => {
     res.sendFile("index.html", { root: "public" });
 });
+
+// app.get('/product', (req, res) => {
+//     res.sendFile("product.html", { root: "public" });
+// });
+
 
 app.get('/signup', (req, res) => {
     res.sendFile("signup.html", { root: "public" });
@@ -560,6 +567,43 @@ app.get('/cart', (req, res) => {
 app.get('/checkout', (req, res) => {
     res.sendFile("checkout.html", { root: "public" });
 });
+
+
+app.post("/create-order", async (req, res) => {
+    const request = new paypal.orders.OrdersCreateRequest();
+    request.requestBody({
+        intent: "CAPTURE",
+        purchase_units: [
+            {
+                amount: {
+                    currency_code: "USD",
+                    value: req.body.amount, // Pass the total order amount
+                },
+            },
+        ],
+    });
+
+    try {
+        const order = await client().execute(request);
+        res.json({ id: order.result.id });
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
+app.post("/capture-order", async (req, res) => {
+    const orderId = req.body.orderID;
+    const request = new paypal.orders.OrdersCaptureRequest(orderId);
+    request.requestBody({});
+
+    try {
+        const capture = await client().execute(request);
+        res.json(capture.result);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
 
 // 404 route
 app.get('/404', (req, res) => {

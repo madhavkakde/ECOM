@@ -57,6 +57,37 @@
             </div>
         </div>
     </div>
+    
+    <script src="https://www.paypal.com/sdk/js?client-id=your_client_id&currency=USD"></script>
+
+<div id="paypal-button-container"></div>
+
+<script>
+paypal.Buttons({
+    createOrder: function(data, actions) {
+        return fetch("/paypal/create-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount: "10.00" }) // Replace with actual order total
+        })
+        .then(response => response.json())
+        .then(order => order.id);
+    },
+    onApprove: function(data, actions) {
+        return fetch("/paypal/capture-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ orderID: data.orderID })
+        })
+        .then(response => response.json())
+        .then(orderDetails => {
+            alert("Transaction completed successfully!");
+            console.log(orderDetails);
+        });
+    }
+}).render("#paypal-button-container");
+</script>
+
 
     <script src="js/nav.js"></script>
     <script src="js/home.js"></script>

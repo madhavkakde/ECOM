@@ -10,6 +10,8 @@ const placeOrderBtn = document.querySelector('.place-order-btn');
 placeOrderBtn.addEventListener('click', () => {
     let address = getAdress();
     console.log(address);
+
+    //send data to backend
 });
 
 const getAdress = () => {
