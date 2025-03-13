@@ -180,6 +180,29 @@ app.post('/login', async (req, res) => {
     }
 });
 
+// products route
+app.get('/products', async (req, res) => {
+   res.sendFile("products_tab.html", { root: "public"});
+});
+
+app.get('/all-products', async (req, res) => {
+    
+    try {
+        const products = await product.find({});
+       return res.json(products);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// app.post('/products', async (req, res) => {
+//      try {
+//         const products = await product.find({});
+//        return res.json(products);
+//     } catch (error) {
+//         res.status(500).json({ message: error.message });
+//     }
+// });
 // seller route
 app.get('/seller', (req, res) => {
     res.sendFile("seller.html", { root: "public" });
