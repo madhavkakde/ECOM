@@ -12,16 +12,10 @@ const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("cloudinary").v2;
 const cors = require('cors');
-const paypal = require("@paypal/checkout-server-sdk");
-const client = require('./public/js/paypalConfig');
 
 // Initialize the server
 const app = express();
 const PORT = process.env.PORT || 5000;
-
-// // aws
-// const aws = require('aws-sdk');
-// const dotenv = require('dotenv');
 
 // Configure Cloudinary
 cloudinary.config({
@@ -72,17 +66,12 @@ let db = connectDB();
 app.get('/', (req, res) => {
     res.sendFile("index.html", { root: "public" });
 });
-
-// app.get('/product', (req, res) => {
-//     res.sendFile("product.html", { root: "public" });
-// });
-
-
+// signup get route
 app.get('/signup', (req, res) => {
     res.sendFile("signup.html", { root: "public" });
 });
 
-// Signup route
+// Signup post route
 app.post('/signup', async (req, res) => {
     const { name, email, password, number, tc } = req.body;
 
@@ -136,11 +125,12 @@ app.post('/signup', async (req, res) => {
     }
 });
 
-// login route
+// login get route
 app.get('/login', (req, res) => {
     res.sendFile("login.html", { root: "public" });
 })
 
+// login post route
 app.post('/login', async (req, res) => {
     let { email, password } = req.body;
 
@@ -183,27 +173,30 @@ app.post('/login', async (req, res) => {
 
 // products route
 app.get('/products', async (req, res) => {
-   res.sendFile("products_tab.html", { root: "public"});
+    res.sendFile("products_tab.html", { root: "public" });
 });
 
+// Get all products by tags 
 app.get('/all-products', async (req, res) => {
-    
+
     try {
         const products = await product.find({});
-       return res.json(products);
+        return res.json(products);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
 
-// app.post('/products', async (req, res) => {
-//      try {
-//         const products = await product.find({});
-//        return res.json(products);
-//     } catch (error) {
-//         res.status(500).json({ message: error.message });
-//     }
-// });
+// about us page route
+app.get('/about', (req, res) => {
+    res.sendFile("about.html", { root: "public" });
+});
+
+// contact us page route
+app.get('/contact-us', (req, res) => {
+    res.sendFile("contact-us.html", { root: "public" });
+});
+
 // seller route
 app.get('/seller', (req, res) => {
     res.sendFile("seller.html", { root: "public" });
@@ -216,8 +209,6 @@ app.post('/seller', async (req, res) => {
         return res.status(400).json({ error: 'Some information(s) are missing or invalid' }); // Improved error handling
     }
     else {
-
-
         try {
             // Create or update the seller document
             const seller = await sellerModel.findOneAndUpdate(
@@ -248,9 +239,6 @@ app.post('/seller', async (req, res) => {
     }
 });
 
-
-
-
 //dashboard route
 app.get('/dashboard', (req, res) => {
     res.sendFile("dashboard.html", { root: "public" });
@@ -265,12 +253,11 @@ app.get('/add-product/:id', (req, res) => {
     res.sendFile("add-product.html", { root: "public" });
 })
 
-
-
+// Add product route
 app.post('/add-product', (req, res) => {
     let { name, shortDes, detail, price, image, tags, email, draft, id } = req.body;
 
-    if(!draft){
+    if (!draft) {
         if (!name.length) {
             res.json({ 'alert': 'should enter the product name' });
         }
@@ -287,99 +274,55 @@ app.post('/add-product', (req, res) => {
             res.json({ 'alert': 'enter the product tags' });
         }
     }
-        // code for firebase
-
-        // let docName = `${name.toLowerCase()}.${Math.floor(Math.random() * 50000)}`
-
-        // let product = collection(db, "products");
-        // setDoc(doc(products, docName), req.body)
-        // .then(data => {
-        //     res.json({'product': name});
-        // })
-        // .catch(err => {
-        //     res.json({'alert': 'some error occured'});
-        // })
-
-        // code for mongodb
-         // Create a unique document name
-        // Check if id is defined
-if (id === undefined) {
-    console.log(id)
-    // Generate a new document name
-    const docName = `${name.toLowerCase()}.${Math.floor(Math.random() * 50000)}`;
-    // Create a new product instance
-    const newProduct = new product({
-        name: docName,
-        email: sellerModel.email,
-        img: uploadedImageUrl == '' ? image : uploadedImageUrl,
-        ...req.body // Spread the rest of the fields from the request body
-    });
-    console.log(4)
-    // Save the product to the database
-    newProduct.save()
-        .then(savedProduct => {
-            res.json({ product: savedProduct });
-        })
-        .catch(err => {
-            console.error('Error adding product:', err);
-            res.status(500).json({ alert: 'An error occurred while adding the product' });
+    // Create a unique document name
+    // Check if id is defined
+    if (id === undefined) {
+        console.log(id)
+        // Generate a new document name
+        const docName = `${name.toLowerCase()}.${Math.floor(Math.random() * 50000)}`;
+        // Create a new product instance
+        const newProduct = new product({
+            name: docName,
+            email: sellerModel.email,
+            img: uploadedImageUrl == '' ? image : uploadedImageUrl,
+            ...req.body // Spread the rest of the fields from the request body
         });
-} else {
-    // If id is defined, update the existing product
-    product.findByIdAndUpdate(id, {
-        name: req.body.name || undefined, // Only update if provided
-        email: sellerModel.email,
-        img: uploadedImageUrl,
-        ...req.body // Spread the rest of the fields from the request body
-    }, { new: true }) // Return the updated document
-    .then(updatedProduct => {
-        if (!updatedProduct) {
-            return res.status(404).json({ alert: 'Product not found' });
-        }
-        res.json({ product: updatedProduct });
-    })
-    .catch(err => {
-        console.error('Error updating product:', err);
-        res.status(500).json({ alert: 'An error occurred while updating the product' });
-    });
-}
-    
-})
+        console.log(4)
+        // Save the product to the database
+        newProduct.save()
+            .then(savedProduct => {
+                res.json({ product: savedProduct });
+            })
+            .catch(err => {
+                console.error('Error adding product:', err);
+                res.status(500).json({ alert: 'An error occurred while adding the product' });
+            });
+    } else {
+        // If id is defined, update the existing product
+        product.findByIdAndUpdate(id, {
+            name: req.body.name || undefined, // Only update if provided
+            email: sellerModel.email,
+            img: uploadedImageUrl,
+            ...req.body // Spread the rest of the fields from the request body
+        }, { new: true }) // Return the updated document
+            .then(updatedProduct => {
+                if (!updatedProduct) {
+                    return res.status(404).json({ alert: 'Product not found' });
+                }
+                res.json({ product: updatedProduct });
+            })
+            .catch(err => {
+                console.error('Error updating product:', err);
+                res.status(500).json({ alert: 'An error occurred while updating the product' });
+            });
+    }
+});
 
-//get-products route
-
-
-
-// CODE FROM YOUTUBE FOR FIRESTORE
-
-//     let products = collection(db, "products");
-//     let docRef;
-
-//     docRef = getDocs(query(products, where("email", "==", email)))
-
-//     docRef.then(products => { 
-//         if(products.empty){
-//             return res.json('no products');
-//         }
-//         let productArr = [];
-
-//         products.forEach(item => {
-//             let data = item.data();
-//             data.id = item.id;
-//             productArr.push(data);
-//         })
-//         res.json(productArr);
-//     })
-
-// })
-
-// CODE FOR MONGODB
+// get-products route
 app.post('/get-products', async (req, res) => {
     const { email, id, tags } = req.body;
     console.log(req.body); // Log the incoming request body
     console.log(id)
-    // Check if an ID is provided
-    console.log(1)
     if (id) {
         try {
             // Find the product by ID
@@ -399,25 +342,23 @@ app.post('/get-products', async (req, res) => {
             return res.status(500).json({ error: 'Internal server error' });
         }
     }
-    else if(tags){
-        // CODE FROM YOUTUBE FOR FIRESTORE
-        // docRef = getDocs(query(products, where("tags", "array-container", tag)))
-        try{
-        //CODE FOR YOUTUBE
-        const query = { tags: { $in: tags } }; 
-        const results = await product.find(query).lean(); // Use lean() for plain JavaScript objects
-        console.log('Found products:', results);
-        if (results.length === 0) {
-            return res.status(404).json({ message: 'No products found for the given tags' });
+
+    else if (tags) {
+        try {
+            const query = { tags: { $in: tags } };
+            const results = await product.find(query).lean(); // Use lean() for plain JavaScript objects
+            console.log('Found products:', results);
+            if (results.length === 0) {
+                return res.status(404).json({ message: 'No products found for the given tags' });
+            }
+            return res.status(200).json(results);
         }
-        return res.status(200).json(results);
-    }
         catch (error) {
             console.error('Error finding products by tags:', error);
             return res.status(500).json({ error: 'Internal server error' });
         }
     }
-     else {
+    else {
         // If no ID is provided, check for email
         if (!email) {
             return res.status(400).json({ error: 'Email is required' });
@@ -447,22 +388,7 @@ app.post('/get-products', async (req, res) => {
     }
 });
 
-// delete-product route
-
-// CODE FROM YOUTUBE FOR FIRESTORE
-
-// app.post('/delete-product', (req, res) => {
-//     let {id} = req.body;
-
-//     deleteDoc(doc(collection(db, "products"), id))
-//     .then(data => {
-//         res.json('success');
-//     }).catch(err => {
-//         res.json('err');
-//     })
-// })
-
-// CODE FOR MONGODB
+// Delete product route
 app.post('/delete-product', async (req, res) => {
     const { id } = req.body;
 
@@ -500,21 +426,11 @@ app.get('/search/:key', async (req, res) => {
 app.post('/add-review', (req, res) => {
     let { headline, review, rate, email, product } = req.body;
     console.log(req.body)
-    
+
     // FORM VALIDATION
     if (!headline.length || !review.length || rate == 0 || email == null || !product) {
         return res.json({ 'alert': 'Fill all the inputs' });
     }
-
-    // CODE FROM YOUTUBE FOR FIRESTORE
-    // storing review in db
-    // let reviews = collection(db, "reviews");
-    // let docName =  `review-${email}-${product}`;
-
-    // setDoc(doc(reviews, docName), req.body)
-    // .then(data => {
-    //     return res.json({'review': data.data()})
-    // }).catch(err => res.json({'alert': 'some error occured'}));
 
     // CODE FOR MONGODB
     const newReview = new Review({
@@ -574,7 +490,6 @@ app.post('/get-reviews', async (req, res) => {
         }
 
         // Send the response with the collected reviews
-
         return res.json(reviewArr);
     } catch (err) {
         console.error('Error fetching reviews: ', err);
@@ -595,10 +510,10 @@ app.get('/checkout', (req, res) => {
 // Route to place an order
 app.post('/place-order', async (req, res) => {
     try {
-        const {  address, products, paymentMethod } = req.body;
+        const { address, products, paymentMethod } = req.body;
         console.log("Received order data:", req.body);
         // Validate the incoming data
-        if ( !address || !products || products.length === 0) {
+        if (!address || !products || products.length === 0) {
             return res.status(400).json({ success: false, message: "Invalid order details" });
         }
 
@@ -626,55 +541,6 @@ app.post('/place-order', async (req, res) => {
         res.status(500).json({ success: false, message: "Server error. Please try again." });
     }
 });
-// ✅ Create PayPal Order
-app.post("/create-order", async (req, res) => {
-    try {
-      console.log("Creating PayPal order...");
-      
-      const { amount } = req.body; // Get amount from frontend
-  
-      const request = new paypal.orders.OrdersCreateRequest();
-      request.requestBody({
-        intent: "CAPTURE",
-        purchase_units: [
-          {
-            amount: {
-              currency_code: "USD",
-              value: 100, // Ensure it's a string
-            },
-          },
-        ],
-      });
-  
-      const order = await client.execute(request);
-      console.log("Order created:", order.result.id);
-      
-      res.json({ orderID: order.result.id });
-    } catch (err) {
-      console.error("Error creating order:", err);
-      res.status(500).json({ error: err.message });
-    }
-  });
-  
-  // ✅ Capture PayPal Payment
-  app.post("/capture-order", async (req, res) => {
-    try {
-      const { orderID } = req.body;
-      console.log("Capturing order:", orderID);
-      
-      const request = new paypal.orders.OrdersCaptureRequest(orderID);
-      request.requestBody({}); // Required but can be empty
-  
-      const capture = await client.execute(request);
-      console.log("Payment captured:", capture.result);
-      
-      res.json(capture.result);
-    } catch (err) {
-      console.error("Error capturing payment:", err);
-      res.status(500).json({ error: err.message });
-    }
-  });
-  
 
 // 404 route
 app.get('/404', (req, res) => {

@@ -1,6 +1,6 @@
 const createProduct = (data) => {
 
-    let  productContainer = document.querySelector('.product-container');
+    let productContainer = document.querySelector('.product-container');
     productContainer.innerHTML += `
         <div class="product-card">
             <button class="btn edit-btn" onclick="location.href='/add-product/${data.id}'" ><img src="img/edit.png" alt=""></button> 
@@ -15,15 +15,15 @@ const createProduct = (data) => {
 const deleteItem = (id) => {
     fetch('/delete-product', {
         method: 'post',
-        headers: new Headers({'Content-Type': 'application/json'}),
-        body: JSON.stringify({id: id})
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ id: id })
     }).then(res => res.json())
-    .then(data => {
-        //process data
-        if(data == 'success'){
-            location.reload();
-        } else{
-            showAlert('some error occured');
-        }
-    })
+        .then(data => {
+            //process data
+            if (data == 'success') {
+                location.reload();
+            } else {
+                showAlert('some error occured');
+            }
+        })
 }

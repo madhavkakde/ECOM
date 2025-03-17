@@ -1,7 +1,7 @@
 let user = JSON.parse(sessionStorage.user || null);
 
-window.onload = () =>{
-    if(user == null){
+window.onload = () => {
+    if (user == null) {
         location.replace('/login');
     }
 }
@@ -11,12 +11,12 @@ editables.map((element) => {
     let placeholder = element.getAttribute('data-placeholder');
     element.innerHTML = placeholder;
     element.addEventListener('focus', () => {
-        if(element.innerHTML == placeholder){
+        if (element.innerHTML == placeholder) {
             element.innerHTML = '';
         }
     })
     element.addEventListener('focusout', () => {
-        if(!element.innerHTML.length){
+        if (!element.innerHTML.length) {
             element.innerHTML = placeholder;
         }
     })
@@ -27,33 +27,6 @@ let uploadInput = document.querySelector('#upload-img');
 let imagePath = "./img/noImage.png";
 console.log("at assign ", imagePath);
 
-//code from youtube
-
-// uploadInput.addEventListener('change', () => {
-//     const file = uploadInput.files[0];
-//     let imageUrl;
-
-//     if(file.type.includes('image')){
-//         // means its an image
-//         fetch("/image-url").then(res => res.json())
-//         .then(url =>{
-//             fetch(url, {
-//                 method: 'PUT',
-//                 headers: new Headers({
-//                 'Content-Type': 'multipart/form-data'}),
-//                 body: file
-//         }).then(res => {
-//             imagePath = url;
-
-//             let productImage = document.querySelector('.product-img');
-//             productImage.src = imagePath;
-//         })
-
-//         })
-//     }
-// })
-
-// FROM AI
 uploadInput.addEventListener('change', () => {
     const file = uploadInput.files[0];
 
@@ -67,18 +40,18 @@ uploadInput.addEventListener('change', () => {
             method: 'POST',
             body: formData
         })
-        .then(res => res.json())
-        .then(data => {
-            // Assuming the response contains the new image URL
-            const imagePath = data.imageUrl;
-            // Update the image source in the DOM
-            let productImage = document.querySelector('.product-img');
-            productImage.src = imagePath;
-            console.log('Image uploaded successfully:', imagePath);
-        })
-        .catch(err => {
-            console.error('Error uploading image:', err);
-        });
+            .then(res => res.json())
+            .then(data => {
+                // Assuming the response contains the new image URL
+                const imagePath = data.imageUrl;
+                // Update the image source in the DOM
+                let productImage = document.querySelector('.product-img');
+                productImage.src = imagePath;
+                console.log('Image uploaded successfully:', imagePath);
+            })
+            .catch(err => {
+                console.error('Error uploading image:', err);
+            });
     } else {
         alert('Please select a valid image file.');
     }
@@ -96,39 +69,38 @@ let tags = document.querySelector('.tags');
 
 addProductBtn.addEventListener('click', () => {
     //verification
-    if(productName.innerHTML == productName.getAttribute('data-placeholder')){
+    if (productName.innerHTML == productName.getAttribute('data-placeholder')) {
         showFormError('should enter the product name');
     }
-    else if(shortDes.innerHTML == shortDes.getAttribute('data-placeholder')){
+    else if (shortDes.innerHTML == shortDes.getAttribute('data-placeholder')) {
         showFormError('enter the product description');
     }
-    else if((price.innerHTML == price.getAttribute('data-placeholder')) || !Number(price.innerHTML))
-        {
+    else if ((price.innerHTML == price.getAttribute('data-placeholder')) || !Number(price.innerHTML)) {
         showFormError('enter the product price');
-        }
-    else if(detail.innerHTML == detail.getAttribute('data-placeholder')){
-            showFormError('enter the product details');
-            }
-    else if(tags.innerHTML == tags.getAttribute('data-placeholder')){
-                showFormError('enter the product tags');
-                }
-    else{
+    }
+    else if (detail.innerHTML == detail.getAttribute('data-placeholder')) {
+        showFormError('enter the product details');
+    }
+    else if (tags.innerHTML == tags.getAttribute('data-placeholder')) {
+        showFormError('enter the product tags');
+    }
+    else {
         //submit form
         loader.style.display = 'block';
-        let data = productData(); 
-        if(productId){ // checking for existing id 
+        let data = productData();
+        if (productId) { // checking for existing id 
             data.id = productId;
         }
         sendData('/add-product', data);
     }
 })
 
-const productData = () =>{
+const productData = () => {
     let tagsArr = tags.innerText.split(",");
     tagsArr.forEach((item, i) => tagsArr[i].trim().toLowerCase());
 
-    return{
-        
+    return {
+
         name: productName.innerText,
         shortDes: shortDes.innerText,
         price: price.innerText,
@@ -142,16 +114,16 @@ const productData = () =>{
 // draft btn
 let draftBtn = document.querySelector('.draft-btn');
 draftBtn.addEventListener('click', () => {
-    if(!productName.innerHTML.length || productName.innerHTML == productName.getAttribute('data-placeholder')){
+    if (!productName.innerHTML.length || productName.innerHTML == productName.getAttribute('data-placeholder')) {
         showFormError('enter the product name');
-    }else{
+    } else {
         let data = productData();
         loader.style.display = 'block';
         data.draft = true;
-        if(productId){ // checking for existing id 
+        if (productId) { // checking for existing id 
             data.id = productId;
         }
-        console.log("-1",data)
+        console.log("-1", data)
         sendData('/add-product', data);
         console.log(data)
     }
@@ -169,35 +141,35 @@ const fetchProductData = () => {
     }
     fetch('/get-products', {
         method: 'POST',
-        headers: new Headers({'Content-Type': 'application/json'}),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ id: productId }) // Send the product ID in the request body
     })
-    .then(res => {
-        console.log('Response received:', res);
-        if (!res.ok) {
-            throw new Error('Network response was not ok: ' + res.statusText);
-        }
-        return res.json(); // Return the parsed JSON data
-    })
-    .then(data => {
-        console.log('Product data received:', data);
-        setFormData(data); // Populate the form with the received data
-    })
-    .catch(err => console.error('Error fetching product data:', err));
+        .then(res => {
+            console.log('Response received:', res);
+            if (!res.ok) {
+                throw new Error('Network response was not ok: ' + res.statusText);
+            }
+            return res.json(); // Return the parsed JSON data
+        })
+        .then(data => {
+            console.log('Product data received:', data);
+            setFormData(data); // Populate the form with the received data
+        })
+        .catch(err => console.error('Error fetching product data:', err));
 };
 
 const setFormData = (data) => {
     // Check if data is valid before accessing properties
-        productName.innerHTML = data.name; // Set the product name and other info in the form
-        shortDes.innerHTML = data.shortDes;
-        price.innerHTML = data.price;
-        detail.innerHTML = data.detail;
-        tags.innerHTML = data.tags;
+    productName.innerHTML = data.name; // Set the product name and other info in the form
+    shortDes.innerHTML = data.shortDes;
+    price.innerHTML = data.price;
+    detail.innerHTML = data.detail;
+    tags.innerHTML = data.tags;
 
-        let productImg = document.querySelector('.product-img'); // Getting the product image
-        productImg.src = data.img ? data.img : imagePath;
-        console.log(imagePath)
-        console.log(productImg.src)
+    let productImg = document.querySelector('.product-img'); // Getting the product image
+    productImg.src = data.img ? data.img : imagePath;
+    console.log(imagePath)
+    console.log(productImg.src)
 
 };
 

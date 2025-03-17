@@ -1,130 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Store - Checkout</title>
-    <!-- link css -->
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="css/form.css">
-    <link rel="stylesheet" href="css/add-product.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/cart.css">
-    <link rel="stylesheet" href="css/checkout.css">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Store - Checkout</title>
+  <!-- link css -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="css/form.css">
+  <link rel="stylesheet" href="css/add-product.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/cart.css">
+  <link rel="stylesheet" href="css/checkout.css">
 
 </head>
+
 <body>
-    
-    <nav class="navbar dark bg">
 
-    </nav>
+  <nav class="navbar dark bg">
 
-    <div class="error">
-        <p>some error occured</p>
+  </nav>
+
+  <div class="error">
+    <p>some error occured</p>
+  </div>
+
+  <div class="form">
+    <h1 class="heading">checkout</h1>
+    <p class="text">delievery address</p>
+
+    <input type="text" id="name" placeholder="name">
+    <input type="text" id="address" placeholder="address">
+    <input type="text" id="street" placeholder="street">
+    <div class="three-input-container">
+      <input type="text" id="city" placeholder="city">
+      <input type="text" id="state" placeholder="state">
+      <input type="text" id="pincode" placeholder="pincode">
     </div>
+    <input type="text" id="landmark" placeholder="landmark">
+  </div>
+  <div class="cart-section">
+    <div class="product-list">
+      <p class="section-heading">your cart</p>
+      <div class="cart-container">
 
-    <div class="form">
-        <h1 class="heading">checkout</h1>
-        <p class="text">delievery address</p>
-
-        <input type="text" id="name" placeholder="name">
-        <input type="text" id="address" placeholder="address">
-        <input type="text" id="street" placeholder="street">
-        <div class="three-input-container">
-            <input type="text" id="city" placeholder="city">
-        <input type="text" id="state" placeholder="state">
-        <input type="text" id="pincode" placeholder="pincode">
-        </div>
-        <input type="text" id="landmark" placeholder="landmark">
+      </div>
     </div>
-    <div class="cart-section">
-        <div class="product-list">
-            <p class="section-heading">your cart</p>
-            <div class="cart-container">
-                
-            </div>
-        </div>
-        <div class="checkout-section">
-            <div class="checkout-box">
-                <p class="text">your total bill,</p>
-                <p class="bill">$00</p>
-                <button class="place-order-btn">place order</button>
-            </div>
-        </div>
+    <div class="checkout-section">
+      <div class="checkout-box">
+        <p class="text">your total bill,</p>
+        <p class="bill">$00</p>
+        <button class="place-order-btn">place order</button>
+      </div>
     </div>
-<!--     
-    <script src="https://www.paypal.com/sdk/js?client-id=AeCnloDrPFQtWNOHmJJYi09p0k40mK3QIf0Fk91JEae8eA00cYrIFfIIjLJGKbxB3ehDpjXwMNEDJrz9&currency=USD"></script>
+  </div>
 
-<div id="paypal-button-container"></div>
-
-<script>
-      // Hide PayPal button initially
-  document.getElementById("paypal-button-container").style.display = "none";
-
-// Show PayPal button when "Place Order" is clicked
-document.querySelector(".place-order-btn").addEventListener("click", function() {
-    document.getElementById("paypal-button-container").style.display = "block";
-});
-paypal.Buttons({ 
-  createOrder: async function () {
-    try {
-      const response = await fetch("/create-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const order = await response.json();
-      console.log("Order Created:", order.orderID); // Debugging
-      return order.orderID;
-    } catch (error) {
-      console.error("Error creating order:", error);
-      alert("Failed to create order. Please try again.");
-    }
-  },
-
-  onApprove: async function (data) {
-    try {
-      const response = await fetch("/capture-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderID: data.orderID }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const details = await response.json();
-      console.log("Payment Successful:", details); // Debugging
-      alert("Payment successful! Thank you for your purchase.");
-    } catch (error) {
-      console.error("Error capturing order:", error);
-      alert("Failed to process payment. Please try again.");
-    }
-  },
-
-  onError: function (err) {
-    console.error("PayPal Button Error:", err);
-    alert("Something went wrong with PayPal. Please try again.");
-  }
-}).render("#paypal-button-container");
-
-</script> -->
-
-
-    <script src="js/nav.js"></script>
-    <script src="js/home.js"></script>
-    <script src="js/cart.js"></script>
-    <script src="js/common.js"></script>
-    <script src="js/checkout.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/home.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/checkout.js"></script>
 </body>
+
 </html>

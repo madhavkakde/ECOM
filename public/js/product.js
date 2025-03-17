@@ -1,6 +1,3 @@
-// import {getProducts, createProductCards} from './home.js';
-
-
 // Product page setting
 let productName = document.querySelector('.product-title');
 let shortDes = document.querySelector('.product-des');
@@ -23,45 +20,38 @@ const setData = (data) => {
     cartBtn.addEventListener('click', () => {
         cartBtn.innerHTML = add_product_to_cart(data);
     })
-
-
-// buyNowBtn.addEventListener('click', () => {
-//     window.location.href = `/checkout?product=${data.id}`;
-// });
-
 }
-
+//function to fetch product data
 const fetchProductData = () => {
     console.log('Product ID:', productId);
     const requestBody = { id: productId };
     console.log('Request Body:', requestBody);
-    
+
     fetch('/get-products', {
         method: 'POST',
-        headers: new Headers({'Content-Type': 'application/json'}),
-        body: JSON.stringify(requestBody) 
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(requestBody)
     })
-    .then(res => {
-        if (!res.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return res.json(); // Parse the JSON response
-    })
-    .then(data => {
-        if (!data || !data.name) { // Check if the product data is valid
-            alert('Product not found');
-            location.replace('/404');
-            return;
-        }
-        setData(data);
-        alert("product found")
-        getProducts(data.tags[0]).then(res => createProductCards(res, 'similar products', '.best-selling-product-section'));
-    })
-    .catch(err => {
-        console.log(err);
-        alert('No product found');
-        // location.replace('/404');
-    });
+        .then(res => {
+            if (!res.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return res.json(); // Parse the JSON response
+        })
+        .then(data => {
+            if (!data || !data.name) { // Check if the product data is valid
+                alert('Product not found');
+                location.replace('/404');
+                return;
+            }
+            setData(data);
+            getProducts(data.tags[0]).then(res => createProductCards(res, 'similar products', '.best-selling-product-section'));
+        })
+        .catch(err => {
+            console.log(err);
+            alert('No product found');
+            // location.replace('/404');
+        });
 }
 
 let productId = null;

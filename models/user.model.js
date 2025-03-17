@@ -10,7 +10,6 @@ const userSchema = new mongoose.Schema({
     seller: { type: Boolean, default: false } // Track if the user is a seller
 });
 
-
 // Create the User model
 const User = mongoose.model('User ', userSchema);
 

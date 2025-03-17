@@ -1,5 +1,3 @@
-
-
 let ratingStarInput = [...document.querySelectorAll('.rating-star')];
 let rate = 0;
 
@@ -36,13 +34,13 @@ addReviewBtn.addEventListener('click', () => {
             // if either of the fields is empty
             showFormError("all fields are required");
         }
-        else if(reviewHeadline.value.length > 50){
+        else if (reviewHeadline.value.length > 50) {
             showFormError("headline should not be more than 50 characters");
         }
-        else if(review.value.length > 150){
+        else if (review.value.length > 150) {
             showFormError("review should not be more than 150 characters");
         }
-        else{
+        else {
             // send data to the backend
             loader.style.display = "block";
             sendData('/add-review', {
@@ -61,7 +59,7 @@ addReviewBtn.addEventListener('click', () => {
 // FETCH REVIEWS
 
 const getReviews = () => {
-    if(user == null){
+    if (user == null) {
         user = {
             email: undefined
         }
@@ -71,17 +69,17 @@ const getReviews = () => {
         email: user.email,
         product: productId
     })
-    .then(response => {
-        return response;
-    })
-    .then(data => {
-        if (data.length) {
-            createReviewSection(data);   // Process the data as needed
-        } 
-    })
-    .catch(error => {
-        console.error('Error:', error); // Handle any errors
-    });
+        .then(response => {
+            return response;
+        })
+        .then(data => {
+            if (data.length) {
+                createReviewSection(data);   // Process the data as needed
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error); // Handle any errors
+        });
 }
 
 const createReviewSection = (data) => {
@@ -98,7 +96,7 @@ const createReviewCard = data => {
     let cards = '';
 
     for (let i = 0; i < data.length; i++) {
-        if(data[i]){
+        if (data[i]) {
             cards += `
             <div class="review-card">
                 <div class="user-dp" data-rating="${data[i].rating}.0"><img src="../img/user-icon.png" alt="">

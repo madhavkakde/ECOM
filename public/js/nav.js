@@ -3,7 +3,7 @@ const navbar = document.querySelector('.navbar');
 window.addEventListener('scroll', () => {
     if (scrollY >= 180) {
         navbar.classList.add('bg');
-    } else if (scrollY <= 180){
+    } else if (scrollY <= 180) {
         navbar.classList.remove('bg');
     }
 })
@@ -16,8 +16,8 @@ const createNavbar = () => {
             <li class="link-item"><a href="/" class="link">Home</a></li>
             <li class="link-item"><a href="/products" class="link">Product</a></li>
             <li class="link-item"><a href="/Dashboard" class="link">Dashboard</a></li>
-            <li class="link-item"><a href="#" class="link">About</a></li>
-            <li class="link-item"><a href="#" class="link">Contact</a></li>
+            <li class="link-item"><a href="/about" class="link">About</a></li>
+            <li class="link-item"><a href="contact-us" class="link">Contact</a></li>
         </ul>
         <div class="user-interactions">
             <div class="search-box">
@@ -110,11 +110,11 @@ const updateNavCartCounter = () => {
 updateNavCartCounter();
 
 const cartBtnFunction = () => {
-    if(user == null || undefined){
+    if (user == null || undefined) {
         alert('login to view cart');
         location.href = '/login';
     }
-    else{
+    else {
         location.href = '/cart';
     }
 }

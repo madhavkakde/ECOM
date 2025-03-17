@@ -11,15 +11,15 @@ applyBtn.addEventListener('click', async () => {
         showFormError('Some information(s) are missing or invalid');
     } else {
         loader.style.display = 'block';
-        }
+    }
 
-        // Send data to the server
-        await sendData('/seller', {
-            name: businessName,
-            address: address,
-            about: about,
-            number: number,
-            email: JSON.parse(sessionStorage.user).email
-        });
-    
+    // Send data to the server
+    await sendData('/seller', {
+        name: businessName,
+        address: address,
+        about: about,
+        number: number,
+        email: JSON.parse(sessionStorage.user).email
+    });
+
 });

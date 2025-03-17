@@ -1,7 +1,7 @@
 window.onload = () => {
-    if(sessionStorage.user){
+    if (sessionStorage.user) {
         user = JSON.parse(sessionStorage.user);
-        if(user.email){
+        if (user.email) {
             location.replace('/');
         }
     }
@@ -19,23 +19,23 @@ formBtn.addEventListener('click', () => {
     let tc = document.querySelector('#tc') || null;
 
     // form validation
-    if(fullname != null){ // sign up page
-        if(fullname.value.length < 3) {
-            showFormError('Name must be at least 3 characters long');  
+    if (fullname != null) { // sign up page
+        if (fullname.value.length < 3) {
+            showFormError('Name must be at least 3 characters long');
         }
-        else if(!email.value.length) {
-            showFormError('Enter your email');  
+        else if (!email.value.length) {
+            showFormError('Enter your email');
         }
-        else if(password.value.length < 8) {
-            showFormError('Password must be at least 8 characters long');  
+        else if (password.value.length < 8) {
+            showFormError('Password must be at least 8 characters long');
         }
-        else if(Number(number) || number.value.length < 10) {
-            showFormError('Enter a valid phone number');  
+        else if (Number(number) || number.value.length < 10) {
+            showFormError('Enter a valid phone number');
         }
-        else if(!tc.checked) {
-            showFormError('You must agree to the terms and conditions');  
+        else if (!tc.checked) {
+            showFormError('You must agree to the terms and conditions');
         }
-        else{
+        else {
             //submit form
             loader.style.display = 'block';
             sendData('/signup', {
@@ -47,17 +47,17 @@ formBtn.addEventListener('click', () => {
             });
         }
     }
-    else{     // login page
-        if(!email.value.length || !password.value.length) {
+    else {     // login page
+        if (!email.value.length || !password.value.length) {
             showFormError('Please fill in all fields');
-    }
-    else{
+        }
+        else {
             //submit form
             loader.style.display = 'block';
             sendData('/login', {
                 email: email.value,
                 password: password.value
             });
+        }
     }
-}
 });

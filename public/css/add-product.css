@@ -1,8 +1,8 @@
-body{
+body {
     padding: 100px 0;
 }
 
-.loader{
+.loader {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -12,7 +12,7 @@ body{
     display: none;
 }
 
-.title{
+.title {
     text-align: center;
     font-size: 3rem;
     margin-bottom: -30px;
@@ -21,7 +21,7 @@ body{
     opacity: 0.5;
 }
 
-.error{
+.error {
     position: fixed;
     left: 50%;
     top: 50%;
@@ -46,22 +46,27 @@ body{
     border: 1px solid #cacaca;
 
 }
-.error.show{
+
+.error.show {
     opacity: 1;
 }
-.product-img{
+
+.product-img {
     background: #fff;
     width: 100%;
 }
-#uploadForm{
+
+#uploadForm {
     width: 60%;
 }
-.image-upload-container{
-    width:100%;
+
+.image-upload-container {
+    width: 100%;
     position: relative;
     height: 600px;
 }
-.upload-overlay{
+
+.upload-overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -80,45 +85,47 @@ body{
     transition: .5s;
 
 }
-.upload-overlay:hover{
+
+.upload-overlay:hover {
     opacity: 1;
 }
 
-.product-detail{
+.product-detail {
     width: 60%;
     max-width: 60%;
 }
 
-.disable{
+.disable {
     pointer-events: none;
     filter: grayscale(1);
 }
-.cart-btn{
+
+.cart-btn {
     background: #d5be8b;
 
 }
 
-*[contenteditable="true"]{
+*[contenteditable="true"] {
     outline: none;
     border: 2px solid #cacaca;
     padding: 10px;
 }
 
-*[contenteditable="true"]:hover{
+*[contenteditable="true"]:hover {
     border-color: #e6c274;
 }
 
-.des{
+.des {
     height: 500px;
     overflow: scroll;
     white-space: pre-wrap;
 }
 
-.tags-section{
+.tags-section {
     padding: 30px 5vw;
 }
 
-.text{
+.text {
     font-family: 'lato', sans-serif;
     text-transform: capitalize;
     font-size: 1.1rem;
@@ -126,17 +133,18 @@ body{
     opacity: .5;
 }
 
-.tags{
+.tags {
     height: 300px;
     margin: 20px 0;
     font-family: 'lato', sans-serif;
 }
 
-.btn-wrapper{
+.btn-wrapper {
     display: flex;
     justify-content: center;
 }
-.add-product-btn{
+
+.add-product-btn {
     text-transform: capitalize;
     border: none;
     outline: none;
@@ -145,6 +153,7 @@ body{
     cursor: pointer;
     margin-right: 20px;
 }
-.draft-btn{
+
+.draft-btn {
     background: #cacaca;
 }

@@ -10,7 +10,7 @@ const placeOrderBtn = document.querySelector('.place-order-btn');
 placeOrderBtn.addEventListener('click', async () => {
     // Get the address from the form
     let address = getAddress();
-    
+
     // Check if the address is valid
     if (typeof address === "object") {
         // Retrieve the user object from sessionStorage
@@ -19,7 +19,7 @@ placeOrderBtn.addEventListener('click', async () => {
 
         // Get products from local storage
         const cart = JSON.parse(localStorage.getItem("cart")) || [];
-        
+
         // Map the cart items to the required format for the order
         const products = cart.map(item => ({
             productId: item.productId, // Assuming 'item' is the product ID
