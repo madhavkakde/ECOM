@@ -57,36 +57,68 @@
             </div>
         </div>
     </div>
-    
-    <script src="https://www.paypal.com/sdk/js?client-id=your_client_id&currency=USD"></script>
+<!--     
+    <script src="https://www.paypal.com/sdk/js?client-id=AeCnloDrPFQtWNOHmJJYi09p0k40mK3QIf0Fk91JEae8eA00cYrIFfIIjLJGKbxB3ehDpjXwMNEDJrz9&currency=USD"></script>
 
 <div id="paypal-button-container"></div>
 
 <script>
-paypal.Buttons({
-    createOrder: function(data, actions) {
-        return fetch("/paypal/create-order", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ amount: "10.00" }) // Replace with actual order total
-        })
-        .then(response => response.json())
-        .then(order => order.id);
-    },
-    onApprove: function(data, actions) {
-        return fetch("/paypal/capture-order", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ orderID: data.orderID })
-        })
-        .then(response => response.json())
-        .then(orderDetails => {
-            alert("Transaction completed successfully!");
-            console.log(orderDetails);
-        });
+      // Hide PayPal button initially
+  document.getElementById("paypal-button-container").style.display = "none";
+
+// Show PayPal button when "Place Order" is clicked
+document.querySelector(".place-order-btn").addEventListener("click", function() {
+    document.getElementById("paypal-button-container").style.display = "block";
+});
+paypal.Buttons({ 
+  createOrder: async function () {
+    try {
+      const response = await fetch("/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const order = await response.json();
+      console.log("Order Created:", order.orderID); // Debugging
+      return order.orderID;
+    } catch (error) {
+      console.error("Error creating order:", error);
+      alert("Failed to create order. Please try again.");
     }
+  },
+
+  onApprove: async function (data) {
+    try {
+      const response = await fetch("/capture-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderID: data.orderID }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const details = await response.json();
+      console.log("Payment Successful:", details); // Debugging
+      alert("Payment successful! Thank you for your purchase.");
+    } catch (error) {
+      console.error("Error capturing order:", error);
+      alert("Failed to process payment. Please try again.");
+    }
+  },
+
+  onError: function (err) {
+    console.error("PayPal Button Error:", err);
+    alert("Something went wrong with PayPal. Please try again.");
+  }
 }).render("#paypal-button-container");
-</script>
+
+</script> -->
 
 
     <script src="js/nav.js"></script>

@@ -7,12 +7,13 @@ const bcrypt = require('bcrypt'); // Import bcrypt for password hashing
 const sellerModel = require('./models/seller.model');
 const product = require('./models/product.model');
 const Review = require('./models/review.model');
+const order = require('./models/order.model');
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("cloudinary").v2;
 const cors = require('cors');
 const paypal = require("@paypal/checkout-server-sdk");
-const {client} = require('./public/js/paypalConfig');
+const client = require('./public/js/paypalConfig');
 
 // Initialize the server
 const app = express();
@@ -591,42 +592,89 @@ app.get('/checkout', (req, res) => {
     res.sendFile("checkout.html", { root: "public" });
 });
 
+// Route to place an order
+app.post('/place-order', async (req, res) => {
+    try {
+        const {  address, products, paymentMethod } = req.body;
+        console.log("Received order data:", req.body);
+        // Validate the incoming data
+        if ( !address || !products || products.length === 0) {
+            return res.status(400).json({ success: false, message: "Invalid order details" });
+        }
 
+        // Create a new order (assuming you have a Mongoose model called Order)
+        const newOrder = new order({
+            // userId,
+            address,
+            products: products.map(item => ({
+                productId: item.productId,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity
+            })),
+            paymentMethod,
+            status: "Pending"
+        });
+
+        // Save the order to the database
+        await newOrder.save();
+
+        // Respond with success
+        res.status(201).json({ success: true, message: "Order placed successfully!", order: newOrder });
+    } catch (err) {
+        console.error("Error placing order:", err);
+        res.status(500).json({ success: false, message: "Server error. Please try again." });
+    }
+});
+// ✅ Create PayPal Order
 app.post("/create-order", async (req, res) => {
-    const request = new paypal.orders.OrdersCreateRequest();
-    request.requestBody({
+    try {
+      console.log("Creating PayPal order...");
+      
+      const { amount } = req.body; // Get amount from frontend
+  
+      const request = new paypal.orders.OrdersCreateRequest();
+      request.requestBody({
         intent: "CAPTURE",
         purchase_units: [
-            {
-                amount: {
-                    currency_code: "USD",
-                    value: req.body.amount, // Pass the total order amount
-                },
+          {
+            amount: {
+              currency_code: "USD",
+              value: 100, // Ensure it's a string
             },
+          },
         ],
-    });
-
-    try {
-        const order = await client().execute(request);
-        res.json({ id: order.result.id });
-    } catch (error) {
-        res.status(500).send(error.message);
+      });
+  
+      const order = await client.execute(request);
+      console.log("Order created:", order.result.id);
+      
+      res.json({ orderID: order.result.id });
+    } catch (err) {
+      console.error("Error creating order:", err);
+      res.status(500).json({ error: err.message });
     }
-});
-
-app.post("/capture-order", async (req, res) => {
-    const orderId = req.body.orderID;
-    const request = new paypal.orders.OrdersCaptureRequest(orderId);
-    request.requestBody({});
-
+  });
+  
+  // ✅ Capture PayPal Payment
+  app.post("/capture-order", async (req, res) => {
     try {
-        const capture = await client().execute(request);
-        res.json(capture.result);
-    } catch (error) {
-        res.status(500).send(error.message);
+      const { orderID } = req.body;
+      console.log("Capturing order:", orderID);
+      
+      const request = new paypal.orders.OrdersCaptureRequest(orderID);
+      request.requestBody({}); // Required but can be empty
+  
+      const capture = await client.execute(request);
+      console.log("Payment captured:", capture.result);
+      
+      res.json(capture.result);
+    } catch (err) {
+      console.error("Error capturing payment:", err);
+      res.status(500).json({ error: err.message });
     }
-});
-
+  });
+  
 
 // 404 route
 app.get('/404', (req, res) => {

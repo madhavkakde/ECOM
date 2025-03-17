@@ -1,13 +1,16 @@
-const paypal = require("@paypal/checkout-server-sdk");
+
 require("dotenv").config();
+const paypal = require("@paypal/checkout-server-sdk");
 
-function environment() {
-    return new paypal.core.SandboxEnvironment(process.env.PAYPAL_CLIENT_ID, process.env.PAYPAL_CLIENT_SECRET);
-    // Use `LiveEnvironment` for production
+function getPayPalClient() {
+  return new paypal.core.PayPalHttpClient(
+    new paypal.core.SandboxEnvironment(
+      process.env.PAYPAL_CLIENT_ID,
+        process.env.PAYPAL_CLIENT_SECRET
+    )
+  );
 }
 
-function client() {
-    return new paypal.core.PayPalHttpClient(environment());
-}
+const client = getPayPalClient();
 
-module.exports = { client };
+module.exports = client;

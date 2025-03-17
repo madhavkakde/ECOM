@@ -67,6 +67,7 @@ const add_product_to_cart = product => {
     }
 
     product = {
+        productId: product._id,
         item: 1,
         name: product.name,
         price: product.price,

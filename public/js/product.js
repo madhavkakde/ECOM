@@ -10,6 +10,7 @@ let detail = document.querySelector('.des'); // Ensure this element exists
 let title = document.querySelector('title');
 
 let cartBtn = document.querySelector('.cart-btn');
+// let buyNowBtn = document.querySelector('.buy-btn');
 
 const setData = (data) => {
     title.innerHTML = data.name; // Set the title
@@ -22,6 +23,12 @@ const setData = (data) => {
     cartBtn.addEventListener('click', () => {
         cartBtn.innerHTML = add_product_to_cart(data);
     })
+
+
+// buyNowBtn.addEventListener('click', () => {
+//     window.location.href = `/checkout?product=${data.id}`;
+// });
+
 }
 
 const fetchProductData = () => {
